@@ -1,20 +1,21 @@
 import { message, Modal, Table } from 'antd';
 import axios from 'axios';
 import moment from 'moment';
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { useRouter } from "next/navigation";
 import { useSelector } from 'react-redux';
 
 function UserOrdersList() {
-    const [loading = false, setLoading] = React.useState<boolean>(false);
-    const [showCancelModel = false, setShowCancelModel] = React.useState<boolean>(false);
+    const [loading, setLoading] = React.useState<boolean>(false);
+    const [showCancelModel, setShowCancelModel] = React.useState<boolean>(false);
     const [selectedOrder, setSelectedOrder] = React.useState<any>(null);
-    const [statusUpdateLoading = false, setStatusUpdateLoading] = React.useState<boolean>(false);
-    const [orders = [], setOrders] = React.useState([]);
+    const [statusUpdateLoading, setStatusUpdateLoading] = React.useState<boolean>(false);
+    const [orders, setOrders] = React.useState([]);
     const router = useRouter();
-    const { currentUser } = useSelector((state: any) => state.user)
+    const { currentUser } = useSelector((state: any) => state.user);
 
-    const getOrders = async () => {
+    // Wrapping getOrders in useCallback to avoid recreating it on every render
+    const getOrders = useCallback(async () => {
         try {
             setLoading(true);
             const endPoint = `/api/orders?user=${currentUser._id}`;
@@ -26,7 +27,8 @@ function UserOrdersList() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [currentUser._id]); // Include currentUser._id as a dependency
+
     const onStatusUpdate = async (orderId: string, status: string) => {
         try {
             setStatusUpdateLoading(true);
@@ -34,16 +36,18 @@ function UserOrdersList() {
             await axios.put(endPoint, { orderStatus: status });
             message.success("Your Order has been Cancelled successfully, Thank You");
             setShowCancelModel(false);
-            getOrders();
+            getOrders(); // Refresh orders after status update
         } catch (error: any) {
-            message.error(error.response.data.message);
+            message.error(error.response?.data?.message || error.message);
         } finally {
             setStatusUpdateLoading(false);
         }
     };
+
     useEffect(() => {
         getOrders();
-    }, []);
+    }, [getOrders]); // Include getOrders as a dependency
+
     const columns = [
         {
             title: "Order ID",
@@ -63,15 +67,17 @@ function UserOrdersList() {
             title: "Action",
             render: (record: any) => (
                 <div className="flex gap-5">
-                    {record.orderStatus !== "shipped"  && record.orderStatus !=="cancelled" && (<span 
-                    className='underline cursor-pointer'
-                        onClick={() => {
-                            setSelectedOrder(record);
-                            setShowCancelModel(true);
-                        }}
-                    >
-                        Cancel
-                    </span>)}
+                    {record.orderStatus !== "shipped" && record.orderStatus !== "cancelled" && (
+                        <span 
+                            className='underline cursor-pointer'
+                            onClick={() => {
+                                setSelectedOrder(record);
+                                setShowCancelModel(true);
+                            }}
+                        >
+                            Cancel
+                        </span>
+                    )}
                     <span className='underline cursor-pointer'
                         onClick={() => {
                             router.push(`/profile/orders/${record._id}`);
@@ -82,11 +88,11 @@ function UserOrdersList() {
                 </div>
             ),
         },
-    ]
+    ];
+
     return (
         <div>
-            <Table columns={columns} dataSource={orders} rowKey="_id"
-                loading={loading} pagination={false} />
+            <Table columns={columns} dataSource={orders} rowKey="_id" loading={loading} pagination={false} />
 
             {selectedOrder && (
                 <Modal
@@ -107,12 +113,12 @@ function UserOrdersList() {
                     }}
                 >
                     <p className='my-10 text-gray-600'>
-                        Are you sure you want to cancel order a{selectedOrder._id} ? This action cannot be undone.
+                        Are you sure you want to cancel order {selectedOrder._id}? This action cannot be undone.
                     </p>
                 </Modal>
             )}
         </div>
-    )
+    );
 }
 
 export default UserOrdersList;

@@ -33,7 +33,7 @@ function EditProduct({ params }: { params: any }) {
     }
   };
 
-  const getProduct = async () => {
+  const getProduct = React.useCallback(async () => {
     try {
       setLoadingProduct(true);
       const response = await axios.get(`/api/product/${params.productid}`);
@@ -44,11 +44,11 @@ function EditProduct({ params }: { params: any }) {
     } finally {
       setLoadingProduct(false);
     }
-  };
+  }, [params.productid]); // Include params.productid as a dependency
 
   React.useEffect(() => {
     getProduct();
-  }, []);
+  }, [getProduct]); // Include getProduct as a dependency
 
   return (
     <div>

@@ -9,18 +9,17 @@ function OrderInfo({ params }: { params: any }) {
   const [loading = false, setLoading] = React.useState<boolean>(false);
   const [order, setOrder] = React.useState<any>(null);
 
-  const getOrder = async () => {
+  const getOrder = React.useCallback(async () => {
     try {
       setLoading(true);
       const response = await axios.get(`/api/orders/${params.orderid}`);
       setOrder(response.data);
-
     } catch (error: any) {
       message.error(error.message);
     } finally {
       setLoading(false);
     }
-  };
+  }, [params.orderid]);
 
   const itemsColumns = [
     {
@@ -45,7 +44,7 @@ function OrderInfo({ params }: { params: any }) {
 
   React.useEffect(() => {
     getOrder();
-  }, []);
+  }, [getOrder]);
 
   const getProperty = (key: string, value: any) => {
     return (

@@ -3,7 +3,7 @@
 import { Badge, Divider, message, Popover } from 'antd';
 import axios from 'axios';
 import { usePathname, useRouter } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Loader from './components/Loader';
 import { useDispatch, useSelector } from 'react-redux';
 import { SetCurrentUser } from './redux/userSlice';
@@ -25,7 +25,7 @@ function LayoutProvider({ children }: { children: React.ReactNode }) {
         setHydrated(true);
     }, [cartItems]);
 
-    const getCurrentUser = async () => {
+    const getCurrentUser = useCallback(async () => {
         try {
             setLoading(true);
             const response = await axios.get('/api/auth/currentUser');
@@ -39,13 +39,13 @@ function LayoutProvider({ children }: { children: React.ReactNode }) {
         } finally {
             setLoading(false);
         }
-    };
-
+    }, [dispatch]);
+    
     useEffect(() => {
         if (isPrivatePage) {
             getCurrentUser();
         }
-    }, [pathname]);
+    }, [pathname, isPrivatePage, getCurrentUser]);
 
     const onLogout = async () => {
         try {

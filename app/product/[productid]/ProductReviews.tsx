@@ -1,17 +1,17 @@
 "use client";
 import { ProductInterface } from "@/interfaces";
-import React from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { Button, Modal, Rate, message } from "antd";
 
 function ProductReviews({ product }: { product: ProductInterface }) {
-  const [loading = false, setLoading] = React.useState<boolean>(false);
-  const [comment = "", setComment] = React.useState<string>("");
-  const [rating = 0, setRating] = React.useState<number>(0);
-  const [showReviewForm, setShowReviewForm] = React.useState(false);
-  const [reviews, setReviews] = React.useState([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [comment, setComment] = useState<string>("");
+  const [rating, setRating] = useState<number>(0);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [reviews, setReviews] = useState<any[]>([]);
 
-  const getReviews = async () => {
+  const getReviews = useCallback(async () => {
     try {
       const endPoint = `/api/reviews?product=${product._id}`;
       const response = await axios.get(endPoint);
@@ -19,7 +19,7 @@ function ProductReviews({ product }: { product: ProductInterface }) {
     } catch (error: any) {
       message.error(error.response.data.message);
     }
-  };
+  }, [product._id]); // Added product._id as a dependency
 
   const submitReview = async () => {
     try {
@@ -40,19 +40,22 @@ function ProductReviews({ product }: { product: ProductInterface }) {
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     getReviews();
-  }, []);
+  }, [getReviews]); // Added getReviews as a dependency
 
   return (
     <div className="mt-5">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-semibold">Reviews</h1>
-        <Button type="primary" onClick={() => {
-          setComment("");
-          setRating(0);
-          setShowReviewForm(true);
-        }}>
+        <Button
+          type="primary"
+          onClick={() => {
+            setComment("");
+            setRating(0);
+            setShowReviewForm(true);
+          }}
+        >
           Write a review
         </Button>
       </div>
@@ -68,19 +71,19 @@ function ProductReviews({ product }: { product: ProductInterface }) {
             key={review._id}
             className="flex flex-col gap-2 border border-gray-400 p-3 border-solid"
           >
-            <div className="flex justify-between ">
+            <div className="flex justify-between">
               <div className="flex gap-2 items-center">
                 <div className="flex p-3 items-center justify-center bg-gray-600 rounded-full h-8 w-8 text-white">
-                   <span>
-                     {review.user.name[0]}
-                   </span>
+                  <span>{review.user.name[0]}</span>
                 </div>
                 <span className="text-sm">{review.user.name}</span>
               </div>
-              <Rate disabled defaultValue={review.rating} 
-               style={{
-                  color: "#26577C"
-               }}
+              <Rate
+                disabled
+                defaultValue={review.rating}
+                style={{
+                  color: "#26577C",
+                }}
               />
             </div>
 
