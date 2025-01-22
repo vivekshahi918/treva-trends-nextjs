@@ -1,6 +1,6 @@
 ##Treva Trends 
 
-##Technology :-Next.js, Redux Toolkit, React, Stripe, MongoDB 
+##Technology :-Next.js, Redux Toolkit, Stripe, MongoDB 
 
 ##Description
 • Developed robust category and product CRUD operations with advanced inventory and image handling
