@@ -61,7 +61,7 @@ export default async function Home({ searchParams }: { searchParams: any }) {
           <div key={product._id} style={styles.productCard}>
             <Link href={`/product/${product._id}`}>
               <div className="text-center">
-                <Image src={product.images[0]} alt="" height={150} width={150} />
+                <Image src={product.images[0]} alt="" height={150} width={150} unoptimized/>
               </div>
 
               <div className="flex flex-col mt-5">
