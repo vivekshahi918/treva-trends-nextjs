@@ -32,7 +32,7 @@ function Cart() {
           {cartItems.map((item) => (
             <div className='grid grid-cols-4 xl:grid-cols-7 items-center xl:gap-10 gap-2' key={item._id}>
               <div className="col-span-4 flex gap-2 items-center">
-                <Image src={item.images[0]} alt="" height={80} width={80}
+                <Image src={item.images[0]} alt="" height={80} width={80} unoptimized
                   className='border p-2 border-gray-300 border-solid'
                 />
                 <div className="flex flex-col gap-2 ">
