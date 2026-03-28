@@ -28,6 +28,7 @@ function ProductImages({
               alt="" 
               height={50} 
               width={50}
+              unoptimized
               className={`object-cover cursor-pointer border  border-solid  p-2  border-gray-300 ${
                 selectedImage === image && 'border-solid border-black border-2'
               }`}
@@ -35,7 +36,7 @@ function ProductImages({
           </div>
         ))}
       </div>
-      <Image src={selectedImage} alt="" height={400} width={400} />
+      <Image src={selectedImage} alt="" height={400} width={400} unoptimized />
     </div>
   );
 }
